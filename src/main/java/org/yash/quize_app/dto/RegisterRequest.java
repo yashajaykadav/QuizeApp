@@ -1,5 +1,12 @@
 package org.yash.quize_app.dto;
 
+import lombok.*;
+
+@Getter
+@Setter
+@AllArgsConstructor
+@NoArgsConstructor
+@Builder
 public class RegisterRequest {
 
     @jakarta.validation.constraints.NotBlank
