@@ -18,7 +18,7 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder  passwordEncoder;
-    private  JwtUtil jwtutil;
+     JwtUtil jwtUtil;
 
     public String register(RegisterRequest registerRequest){
 
@@ -53,7 +53,7 @@ public class AuthService {
             throw  new RuntimeException("Invalid PassWord");
         }
 
-        String token  = jwtutil.generateToken(user.getEmail());
+        String token  = jwtUtil.generateToken(user.getEmail());
 
         return AuthResponse.builder()
                 .token(token)
