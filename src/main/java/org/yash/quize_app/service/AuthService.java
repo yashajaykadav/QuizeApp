@@ -18,7 +18,7 @@ public class AuthService {
 
     private final UserRepository userRepository;
     private final PasswordEncoder  passwordEncoder;
-     JwtUtil jwtUtil;
+    private final JwtUtil jwtUtil;
 
     public String register(RegisterRequest registerRequest){
 
