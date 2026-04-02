@@ -1,0 +1,237 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexusQuiz | Assessment</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .quiz-container {
+            display: grid;
+            grid-template-columns: 1fr 300px;
+            gap: 30px;
+            flex-grow: 1;
+            padding: 20px;
+            max-width: 1400px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        /* Left Side: Question Area */
+        .question-area {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .question-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .question-text-box {
+            font-size: 1.25rem;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        .options-grid {
+            display: grid;
+            gap: 15px;
+        }
+
+        .option-label {
+            display: flex;
+            align-items: center;
+            background: rgba(30, 41, 59, 0.5);
+            border: 2px solid var(--glass-border);
+            padding: 16px 20px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s;
+            font-weight: 500;
+        }
+
+        .option-label:hover {
+            background: rgba(99, 102, 241, 0.1);
+            border-color: var(--accent);
+        }
+
+        .option-label.selected {
+            background: rgba(99, 102, 241, 0.2);
+            border-color: var(--accent);
+        }
+
+        input[type="radio"] {
+            margin-right: 15px;
+            transform: scale(1.3);
+            accent-color: var(--accent);
+        }
+
+        .nav-buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: auto;
+            padding-top: 20px;
+            border-top: 1px solid var(--glass-border);
+        }
+
+        /* Right Side: Navigation Panel & Timer */
+        .sidebar {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .timer-box {
+            text-align: center;
+            padding: 20px;
+            background: rgba(15, 23, 42, 0.8);
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+        }
+
+        .timer-text {
+            font-size: 2.5rem;
+            font-weight: 700;
+            color: var(--warning);
+            font-variant-numeric: tabular-nums;
+        }
+
+        .q-nav-panel {
+            background: var(--card-bg);
+            border-radius: 16px;
+            border: 1px solid var(--glass-border);
+            padding: 20px;
+            flex-grow: 1;
+        }
+
+        .q-nav-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 10px;
+            margin-top: 15px;
+        }
+
+        .q-node {
+            aspect-ratio: 1;
+            border-radius: 8px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s;
+            background: var(--danger); /* Not attempted */
+            color: white;
+            border: none;
+            font-size: 1.1rem;
+        }
+
+        .q-node.attempted {
+            background: var(--success);
+        }
+
+        .q-node.current {
+            background: var(--warning);
+            transform: scale(1.1);
+            box-shadow: 0 0 15px var(--warning);
+            z-index: 2;
+        }
+
+        .q-node:hover {
+            filter: brightness(1.2);
+        }
+
+        .legend {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            font-size: 0.85rem;
+            color: var(--text-muted);
+        }
+
+        .circle {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar" style="padding: 15px 40px;">
+        <div class="nav-brand">Nexus<span>Quiz</span></div>
+        <button class="btn-primary" style="width: auto; padding: 10px 30px; margin: 0; background: var(--danger)" onclick="submitQuizManually()">Submit Final</button>
+    </nav>
+
+    <div class="quiz-container" id="loadingWrapper">
+        <h2 style="text-align: center; grid-column: 1 / -1; margin-top: 50px;">Organizing your assessment...</h2>
+    </div>
+
+    <!-- MAIN QUIZ INTERFACE (Hidden Initially) -->
+    <div class="quiz-container" id="quizWrapper" style="display: none;">
+        
+        <!-- Questions Area -->
+        <div class="glass-card question-area">
+            <div class="question-header">
+                <h3 style="color: var(--text-muted)">Question <span id="qDisplayNum">1</span> of <span id="qTotal">10</span></h3>
+                <span class="badge">Marks: 1</span>
+            </div>
+            
+            <div class="question-text-box" id="qText">
+                Loading question...
+            </div>
+
+            <div class="options-grid">
+                <label class="option-label" id="lblA">
+                    <input type="radio" name="answer" value="A" onchange="markAnswer('A')"> <span id="optA"></span>
+                </label>
+                <label class="option-label" id="lblB">
+                    <input type="radio" name="answer" value="B" onchange="markAnswer('B')"> <span id="optB"></span>
+                </label>
+                <label class="option-label" id="lblC">
+                    <input type="radio" name="answer" value="C" onchange="markAnswer('C')"> <span id="optC"></span>
+                </label>
+                <label class="option-label" id="lblD">
+                    <input type="radio" name="answer" value="D" onchange="markAnswer('D')"> <span id="optD"></span>
+                </label>
+            </div>
+
+            <div class="nav-buttons">
+                <button class="btn-outline" id="btnPrev" onclick="navigate(-1)">Previous</button>
+                <button class="btn-primary" id="btnNext" style="width: auto; padding: 10px 40px; margin: 0" onclick="navigate(1)">Next Question</button>
+            </div>
+        </div>
+
+        <!-- Sidebar / Navigation Panel -->
+        <div class="sidebar">
+            <div class="timer-box">
+                <p style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 5px; text-transform: uppercase; letter-spacing: 2px;">Time Remaining</p>
+                <div class="timer-text" id="timerDisplay">60:00</div>
+            </div>
+
+            <div class="q-nav-panel">
+                <h3 style="margin-bottom: 15px; text-align: center;">Question Palette</h3>
+                
+                <div class="q-nav-grid" id="qPanel">
+                    <!-- Nodes injected here via JS -->
+                </div>
+
+                <div class="legend">
+                    <div><span class="circle" style="background: var(--danger)"></span>Unread</div>
+                    <div><span class="circle" style="background: var(--warning)"></span>Viewing</div>
+                    <div><span class="circle" style="background: var(--success)"></span>Answered</div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+    <script src="js/api.js"></script>
+    <script src="js/student/quiz.js"></script>
+</body>
+</html>

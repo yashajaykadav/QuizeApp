@@ -1,11 +1,8 @@
 package org.yash.quize_app.entity;
 
 import jakarta.persistence.*;
-import jakarta.validation.constraints.NotBlank;
 import lombok.Getter;
 import lombok.Setter;
-
-import java.util.List;
 
 @Entity
 @Getter
@@ -17,13 +14,27 @@ public class Question {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @NotBlank
+    @Column(name = "question_text", nullable = false)
     private String questionText;
 
-    @ManyToOne
-    @JoinColumn(name = "topic_id" , nullable = false)
-    private Topic topic;
+    @Column(name = "option_a", nullable = false)
+    private String optionA;
 
-    @OneToMany(mappedBy = "question" ,cascade = CascadeType.ALL)
-    private List<Answer> answers;
+    @Column(name = "option_b", nullable = false)
+    private String optionB;
+
+    @Column(name = "option_c", nullable = false)
+    private String optionC;
+
+    @Column(name = "option_d", nullable = false)
+    private String optionD;
+
+    @Column(name = "correct_answer", nullable = false)
+    private String correctAnswer; // A / B / C / D
+
+    private Integer marks = 1;
+
+    @ManyToOne
+    @JoinColumn(name = "topic_id", nullable = false)
+    private Topic topic;
 }

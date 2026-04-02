@@ -1,0 +1,346 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>NexusQuiz | Admin Dashboard</title>
+    <link rel="stylesheet" href="css/style.css">
+    <style>
+        .tabs { display: flex; gap: 15px; margin-bottom: 30px; border-bottom: 1px solid var(--glass-border); padding-bottom: 10px; }
+        .tab-btn { padding: 10px 20px; border-radius: 12px; background: transparent; color: var(--text-muted); border: 1px solid transparent; cursor: pointer; transition: 0.3s; font-weight: 600; }
+        .tab-btn:hover { background: rgba(255,255,255,0.05); }
+        .tab-btn.active { background: rgba(245, 158, 11, 0.1); border-color: var(--warning); color: var(--warning); } 
+        .tab-content { display: none; }
+        .tab-content.active { display: block; animation: fadeIn 0.4s ease-in-out; }
+        
+        @keyframes fadeIn { from {opacity: 0; transform: translateY(10px);} to {opacity: 1; transform: translateY(0);} }
+        
+        .admin-form-group { margin-bottom: 15px; }
+        .admin-form-group label { display: block; margin-bottom: 8px; color: var(--text-muted); font-size: 0.9rem; }
+        .admin-form-group input, .admin-form-group select, .admin-form-group textarea { 
+            width: 100%; padding: 12px; border-radius: 8px; border: 1px solid var(--glass-border); background: rgba(15, 23, 42, 0.5); color: white; font-size: 1rem;
+        }
+        
+        .btn-sm { padding: 8px 16px; font-weight: 600; border:none; border-radius: 8px; cursor: pointer; transition: 0.2s; }
+        .btn-sm:hover { filter: brightness(1.2); }
+        .btn-success { background: var(--success); color: white; }
+        .btn-warning { background: var(--warning); color: black; }
+        
+        .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px;}
+    </style>
+</head>
+<body>
+
+    <nav class="navbar" style="background: rgba(15, 23, 42, 0.95); border-bottom-color: var(--warning)">
+        <div class="nav-brand">Nexus<span style="color: var(--warning)">Admin</span></div>
+        <div class="nav-links">
+            <button class="btn-outline" style="border-color: var(--warning); color: var(--warning);" onclick="logout()">Logout</button>
+        </div>
+    </nav>
+
+    <div class="container">
+        <div class="tabs">
+            <button class="tab-btn active" onclick="switchTab('subjects')">Subjects & Topics</button>
+            <button class="tab-btn" onclick="switchTab('questions')">Questions</button>
+            <button class="tab-btn" onclick="switchTab('quizzes')">Schedule Quizzes</button>
+        </div>
+
+        <!-- Subjects & Topics Tab -->
+        <div id="subjects" class="tab-content active">
+            <div class="card-grid">
+                <!-- Subjects -->
+                <div class="glass-card">
+                    <h2 style="margin-bottom: 20px;">Manage Subjects</h2>
+                    <div class="admin-form-group">
+                        <label>New Subject Name</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" id="subjectName" placeholder="E.g., Computer Science">
+                            <button class="btn-sm btn-success" onclick="createSubject()">Save</button>
+                        </div>
+                    </div>
+                    <div class="table-wrapper" style="max-height: 300px; overflow-y: auto;">
+                        <table>
+                            <tbody id="subjectTableTbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Topics -->
+                <div class="glass-card">
+                    <h2 style="margin-bottom: 20px;">Manage Topics</h2>
+                    <div class="admin-form-group">
+                        <label>Select Parent Subject</label>
+                        <select id="topicSubjectSelect"></select>
+                    </div>
+                    <div class="admin-form-group">
+                        <label>New Topic Name</label>
+                        <div style="display: flex; gap: 10px;">
+                            <input type="text" id="topicName" placeholder="E.g., Data Structures">
+                            <button class="btn-sm btn-success" onclick="createTopic()">Save</button>
+                        </div>
+                    </div>
+                    <div class="table-wrapper" style="max-height: 220px; overflow-y: auto;">
+                        <table>
+                            <tbody id="topicTableTbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Questions Tab -->
+        <div id="questions" class="tab-content">
+            <div class="glass-card">
+                <h2 style="margin-bottom: 20px;">Add Question</h2>
+                <div class="card-grid">
+                    <div>
+                        <div class="admin-form-group">
+                            <label>Link to Topic</label>
+                            <select id="qTopicSelect"></select>
+                        </div>
+                        <div class="admin-form-group">
+                            <label>Question Text</label>
+                            <textarea id="qText" rows="4" placeholder="What is the time complexity of..."></textarea>
+                        </div>
+                        <div style="display:flex; gap:10px;">
+                            <div class="admin-form-group" style="flex:1">
+                                <label>Marks</label>
+                                <input type="number" id="qMarks" value="1" min="1">
+                            </div>
+                            <div class="admin-form-group" style="flex:1">
+                                <label>Correct Option (A/B/C/D)</label>
+                                <select id="qCorrect">
+                                    <option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div>
+                        <div class="admin-form-group">
+                            <label>Option A</label>
+                            <input type="text" id="qOptA">
+                        </div>
+                        <div class="admin-form-group">
+                            <label>Option B</label>
+                            <input type="text" id="qOptB">
+                        </div>
+                        <div class="admin-form-group">
+                            <label>Option C</label>
+                            <input type="text" id="qOptC">
+                        </div>
+                        <div class="admin-form-group">
+                            <label>Option D</label>
+                            <input type="text" id="qOptD">
+                        </div>
+                        <button class="btn-sm btn-success" style="width: 100%; margin-top:10px; padding: 12px" onclick="createQuestion()">Add Question to Database</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Quizzes Tab -->
+        <div id="quizzes" class="tab-content">
+            <div class="glass-card">
+                <h2 style="margin-bottom: 20px;">Schedule Assesment</h2>
+                <div class="card-grid">
+                    <div>
+                        <div class="admin-form-group">
+                            <label>Topic Reference</label>
+                            <select id="qzTopicSelect" onchange="loadQuestionsForQuiz()"></select>
+                        </div>
+                        <div class="admin-form-group">
+                            <label>Scheduled Date</label>
+                            <input type="date" id="qzDate">
+                        </div>
+                        <div style="display:flex; gap:10px;">
+                            <div class="admin-form-group" style="flex:1">
+                                <label>Start Time</label>
+                                <input type="time" id="qzStart">
+                            </div>
+                            <div class="admin-form-group" style="flex:1">
+                                <label>End Time</label>
+                                <input type="time" id="qzEnd">
+                            </div>
+                        </div>
+                        <div class="admin-form-group">
+                            <label>Duration (Minutes)</label>
+                            <input type="number" id="qzDuration" value="60">
+                        </div>
+                    </div>
+                    <div>
+                        <label style="color: var(--text-muted); font-size: 0.9rem; margin-bottom: 10px; display: block;">Select Questions to Include:</label>
+                        <div class="table-wrapper" style="max-height: 250px; overflow-y: auto;">
+                            <table>
+                                <tbody id="qzQuestionsTbody">
+                                    <tr><td style="color:var(--text-muted)">Select a topic on the left to see available questions.</td></tr>
+                                </tbody>
+                            </table>
+                        </div>
+                        <button class="btn-sm btn-warning" style="width: 100%; margin-top:20px; padding: 12px" onclick="createQuiz()">Publish Quiz</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="js/api.js"></script>
+    <script>
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(content => content.classList.remove('active'));
+            event.target.classList.add('active');
+            document.getElementById(tabId).classList.add('active');
+        }
+
+        // Global State
+        let allSubjects = [];
+        let allTopics = [];
+
+        async function initAdmin() {
+            await loadSubjects();
+            await loadTopics();
+        }
+
+        async function loadSubjects() {
+            try {
+                allSubjects = await fetchApi('/admin/subjects', { method: 'GET' });
+                const tbody = document.getElementById('subjectTableTbody');
+                const sel = document.getElementById('topicSubjectSelect');
+                
+                tbody.innerHTML = allSubjects.map(s => `<tr><td>#${s.id}</td><td style="font-weight: 500">${s.name}</td><td><button class="btn-sm" style="background: var(--danger)" onclick="deleteSubject(${s.id})">X</button></td></tr>`).join('');
+                sel.innerHTML = '<option value="">-- Choose Subject --</option>' + allSubjects.map(s => `<option value="${s.id}">${s.name}</option>`).join('');
+            } catch(e){}
+        }
+
+        async function loadTopics() {
+            try {
+                allTopics = await fetchApi('/admin/topics', { method: 'GET' });
+                const tbody = document.getElementById('topicTableTbody');
+                const qSel = document.getElementById('qTopicSelect');
+                const qzSel = document.getElementById('qzTopicSelect');
+                
+                tbody.innerHTML = allTopics.map(t => `<tr><td>${t.subject?.name || ''}</td><td style="font-weight: 500; color:var(--accent)">${t.name}</td></tr>`).join('');
+                
+                const opts = '<option value="">-- Choose Topic --</option>' + allTopics.map(t => `<option value="${t.id}">${t.subject?.name} - ${t.name}</option>`).join('');
+                qSel.innerHTML = opts;
+                qzSel.innerHTML = opts;
+            } catch(e){}
+        }
+
+        async function createSubject() {
+            const name = document.getElementById('subjectName').value;
+            if(!name) return;
+            try {
+                await fetchApi('/admin/subjects', { method: 'POST', body: JSON.stringify({ name }) });
+                showToast('Subject Created!');
+                document.getElementById('subjectName').value = '';
+                loadSubjects();
+            } catch(e) {}
+        }
+
+        async function deleteSubject(id) {
+            try {
+                await fetchApi(`/admin/subjects/${id}`, { method: 'DELETE' });
+                showToast('Deleted Subject');
+                loadSubjects();
+            } catch (e) {}
+        }
+
+        async function createTopic() {
+            const subjectId = document.getElementById('topicSubjectSelect').value;
+            const name = document.getElementById('topicName').value;
+            if(!subjectId || !name) { showToast('Select subject and enter name', 'warning'); return; }
+            try {
+                await fetchApi(`/admin/subjects/${subjectId}/topics`, { method: 'POST', body: JSON.stringify({ name }) });
+                showToast('Topic Created!');
+                document.getElementById('topicName').value = '';
+                loadTopics();
+            } catch(e) {}
+        }
+
+        async function createQuestion() {
+            const topicId = document.getElementById('qTopicSelect').value;
+            if(!topicId) { showToast('Please select a topic', 'warning'); return; }
+
+            const payload = {
+                questionText: document.getElementById('qText').value,
+                optionA: document.getElementById('qOptA').value,
+                optionB: document.getElementById('qOptB').value,
+                optionC: document.getElementById('qOptC').value,
+                optionD: document.getElementById('qOptD').value,
+                correctAnswer: document.getElementById('qCorrect').value,
+                marks: parseInt(document.getElementById('qMarks').value)
+            };
+
+            // Basic validation
+            for(let key of Object.keys(payload)) {
+                if(!payload[key] && payload[key] !== 0) { showToast(`Missing data: ${key}`, 'error'); return;}
+            }
+
+            try {
+                await fetchApi(`/admin/topics/${topicId}/questions`, { method: 'POST', body: JSON.stringify(payload) });
+                showToast('Question Added Successfully!');
+                // clear
+                document.getElementById('qText').value = '';
+                document.getElementById('qOptA').value = ''; document.getElementById('qOptB').value = '';
+                document.getElementById('qOptC').value = ''; document.getElementById('qOptD').value = '';
+            } catch(e) {}
+        }
+
+        async function loadQuestionsForQuiz() {
+            const topicId = document.getElementById('qzTopicSelect').value;
+            const tbody = document.getElementById('qzQuestionsTbody');
+            if(!topicId) { tbody.innerHTML = ''; return; }
+
+            try {
+                const qs = await fetchApi(`/admin/topics/${topicId}/questions`);
+                if(qs.length === 0) {
+                    tbody.innerHTML = '<tr><td style="color:var(--danger)">No questions found for this topic. Add some first.</td></tr>';
+                    return;
+                }
+                tbody.innerHTML = qs.map(q => `
+                    <tr>
+                        <td style="width: 30px;"><input type="checkbox" class="q-select-cb" value="${q.id}"></td>
+                        <td style="font-size: 0.9rem">${q.questionText.substring(0, 50)}...</td>
+                    </tr>
+                `).join('');
+            } catch(e) {}
+        }
+
+        async function createQuiz() {
+            const topicId = document.getElementById('qzTopicSelect').value;
+            const scheduledDate = document.getElementById('qzDate').value; // YYYY-MM-DD format native
+            const startTime = document.getElementById('qzStart').value + ':00'; // Spring needs HH:mm:ss
+            const endTime = document.getElementById('qzEnd').value + ':00';
+            const duration = document.getElementById('qzDuration').value;
+
+            // Gather Question IDs
+            const questionIds = Array.from(document.querySelectorAll('.q-select-cb:checked')).map(cb => parseInt(cb.value));
+
+            if(!topicId || !scheduledDate || !startTime || !endTime || questionIds.length === 0) {
+                showToast('Please fill all date/time fields and select at least 1 question', 'warning');
+                return;
+            }
+
+            const payload = {
+                topicId: parseInt(topicId),
+                duration: parseInt(duration),
+                scheduledDate,
+                startTime,
+                endTime,
+                questionIds
+            };
+
+            try {
+                await fetchApi('/admin/quizzes', { method: 'POST', body: JSON.stringify(payload) });
+                showToast('Quiz Published Automatically!', 'success');
+                // clear
+                document.getElementById('qzDate').value = '';
+                document.querySelectorAll('.q-select-cb').forEach(cb => cb.checked = false);
+            } catch(e) {}
+        }
+
+        document.addEventListener('DOMContentLoaded', initAdmin);
+    </script>
+</body>
+</html>

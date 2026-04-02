@@ -22,4 +22,10 @@ public class QuestionController {
     ){
 return ResponseEntity.ok(questionService.createQuestion(topicId, question));
     }
+
+    @GetMapping("/topics/{topicId}/questions")
+    @PreAuthorize("hasRole('ADMIN')")
+    public ResponseEntity<java.util.List<Question>> getQuestionsByTopic(@PathVariable Long topicId) {
+        return ResponseEntity.ok(questionService.getQuestionsByTopic(topicId));
+    }
 }

@@ -14,13 +14,14 @@ public class Answer {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private String answerText;
-
-    private boolean isCorrect;
+    @ManyToOne
+    @JoinColumn(name = "attempt_id", nullable = false)
+    private Attempt attempt;
 
     @ManyToOne
-    @JoinColumn(name = "question_id")
+    @JoinColumn(name = "question_id", nullable = false)
     private Question question;
 
-
+    @Column(name = "selected_option")
+    private String selectedOption;
 }
